@@ -36,9 +36,10 @@ void loop()
   // speed  -128 (Full Reverse)   0 (Stop)   127 (Full Forward)
   // speed  -128 (Full ClockWise)   0 (Stop)   127 (Full CounterClockwise)
   
-  identifyWheels();
-  octagon();
+  
+  moveJoystick(analogRead(X_PIN), analogRead(Y_PIN), analogRead(ROT_PIN_PIN));
+  
   digitalWrite(6, LOW);
-  delay(1000);
+  delay(300);
 }
 

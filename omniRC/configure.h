@@ -72,6 +72,11 @@ static const int ROT_IN_HIGH = 1024;// Extreme CounterClockWise value
 static const int TOLERANCE_IN = 10;
 // atypical alternate 3*2 axis input(unused)
 // each axis has a positive unsigned int value and bool direction.  center/stop lies at (0,0,0)
+static const uint8_t X_PIN = A1;
+static const uint8_t Y_PIN = A2;
+static const uint8_t ROT_PIN = A3;
+static const uint8_t ARM_SERVO_PIN = 26;
+static const uint8_t GRIPPER_SERVO_PIN = 25;
 
 int8_t getMD25SpeedByteFormat(uint8_t MD25address)
 {
