@@ -1,6 +1,12 @@
 #include <Arduino.h>
+
+globalVariables:
+//Global Variables
 enum Wheel_t{FRONT,REAR,LEFT,RIGHT};
 int wheelSpeed[] = {128, 128, 128, 128};
+//end Global Variables
+
+//Motor Controller Constants
 static const uint8_t FRONT_MD25_ADDR = 0xB0 >> 1;                    // Address of front MD25 motor control board
 static const uint8_t REAR_MD25_ADDR = 0xB4 >> 1;                     // Address of rear MD25 motor control board
 static const uint8_t PRIMARY_MD25_ADDR = 0xB0 >> 1;                    // Address of primary MD25 motor control board
@@ -56,6 +62,9 @@ static const uint8_t SECONDARY_MD25_ADDR = 0xB4 >> 1;                     // Add
   static const uint8_t MD25_LEFT_MOTOR_CURRENT_REG = 11;	//The current through motor 1
   static const uint8_t MD25_RIGHT_MOTOR_CURRENT_REG = 12;	//The current through motor 2
   static const uint8_t MD25_VERSION_REG = 13;                   //Software Revision Number
+ //end Motor Controller Constants
+ 
+ //Global Constants
  //Coordinate notations used
  // I(X,Y,ROT)  Input coordinate system refers to a 3 axis joystick. origin at center/stop position of stick.
  // C(X,Y,LEVEL) Course coordinate System(Aerial view).  Origin at lower left corner of start square.
@@ -72,10 +81,53 @@ static const int ROT_IN_HIGH = 1024;// Extreme CounterClockWise value
 static const int TOLERANCE_IN = 10;
 // atypical alternate 3*2 axis input(unused)
 // each axis has a positive unsigned int value and bool direction.  center/stop lies at (0,0,0)
-static const uint8_t X_PIN = A1;
-static const uint8_t Y_PIN = A2;
-static const uint8_t ROT_PIN = A3;
+//end Global Constants
 
+//Pin Assignments
+static const uint8_t X_IN_PIN = A1;
+static const uint8_t Y_IN_PIN = A2;
+static const uint8_t ROT_IN_PIN = A3;
+static const uint8_t COURSE_THETA_PIN = A4;
+static const uint8_t COURSE_MAGNITUDE_PIN = A5;
+static const uint8_t ARM_SERVO_PIN = 26;
+static const uint8_t GRIPPER_SERVO_PIN = 25;
+//end Pin Assignments
+
+// Function Prototypes
+int8_t getMD25SpeedByteFormat(uint8_t MD25address)
+void fullStop()
+void setAutoSpeedRegulationOn(uint8_t MD25address)
+void setAutoSpeedRegulationOff(uint8_t MD25address)
+void setTimeoutOn(uint8_t MD25address)
+void setTimeoutOff(uint8_t MD25address)
+uint8_t getWheelCurrent(Wheel_t wheel)
+uint8_t getVolts(uint8_t MD25address)
+void setMD25SpeedByteFormat(uint8_t MD25address, uint8_t mode)
+int16_t getWheelSpeed(Wheel_t wheel)
+void setWheelSpeed(Wheel_t wheel, int16_t speed)// safest, slightly slower response due to mode checking.  does not assume any SpeedByteFormat or valid data, checks everything.
+void drive4wheelSpeeds(int16_t speedArray[])
+void driveWheelSpeed(Wheel_t wheel, int16_t speed)// fast, potentially unsafe.  does not validate data.
+void drive4wheelSpeeds(int16_t FRONTspeed, int16_t REARspeed, int16_t LEFTspeed, int16_t RIGHTspeed)
+uint8_t getVersion(uint8_t device7bitAddress, uint8_t deviceVersionRegister)
+void changeI2Caddress(uint8_t oldAddress, uint8_t newAddress, uint8_t commandRegister, uint8_t commandDelay) //must be run with ONLY the device whose address is to be changed connected to the I2C bus
+uint8_t getAcceleration(uint8_t MD25address)
+void setAcceleration(uint8_t MD25address, uint8_t value)// value from 1-10.  1 = slowest acceleration, 10 = fastest acceleration
+void setAccelerationBoth(uint8_t value)// value from 1-10.  1 = slowest acceleration, 10 = fastest acceleration
+void identifyWheels()
+void octagon()
+void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int Rotate,)
+void moveJoystick(int X, int Y, int Rotate,)
+void moveForward(int speed, long time)
+void moveRearward(int speed, long time)
+void moveLeft(int speed, long time)
+void moveRight(int speed, long time)
+void moveLF(int speed, long time)
+void moveRF(int speed, long time)
+void moveLR(int speed, long time)
+void moveRR(int speed, long time)
+// end Function Prototypes
+
+//Function Definitions
 int8_t getMD25SpeedByteFormat(uint8_t MD25address)
 {
   int8_t mode = -1;
@@ -701,3 +753,4 @@ void moveRR(int speed, long time)
   delay(time);
   fullStop();
 }
+//end Function Definitions
