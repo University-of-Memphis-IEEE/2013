@@ -169,7 +169,7 @@ class ServoDecodeClass //ServoDecodeClass begin
 
 
 // make one instance for the user
-extern ServoDecodeClass ServoDecode = ServoDecodeClass() ;
+extern ServoDecodeClass ServoDecode = ServoDecodeClass();
 
 void configureRC()//used for debugging, testing, and capturing typical values for setting up constants
 {
@@ -207,23 +207,7 @@ void configureRC()//used for debugging, testing, and capturing typical values fo
 }    
  
  
-void radioControlSetup()
-{
-  sonarSetup();
-  while(!digitalRead(START_PIN))
-  { // wait in empty loop till start button is pressed   
-  }
-  delay(100);
-  zeroCompass();
-  encoderReset();
-  ServoDecode.begin();
-  ServoDecode.setFailsafe(1,1500); // set channel 1 failsafe pulsewidth. right horizontal stick
-  ServoDecode.setFailsafe(2,1500); // set channel 2 failsafe pulsewidth. right vertical stick
-  ServoDecode.setFailsafe(3,1500); // set channel 3 failsafe pulsewidth. left vertical stick
-  ServoDecode.setFailsafe(4,1500); // set channel 4 failsafe pulsewidth. left horizontal stick
-  ServoDecode.setFailsafe(5,1500); // set channel 5 failsafe pulsewidth. left buttons, use to activate bowlight
-  ServoDecode.setFailsafe(6,1500); // set channel 6 failsafe pulsewidth. right buttons, use to override soft stop remotely
-}
+
 
 
 void radioControlLoop()
@@ -272,8 +256,7 @@ void radioControlLoop()
         leftHorizontal = map(leftHorizontal, 750, 2250, -127, 127);       
        rightHorizontal = map(rightHorizontal, 750, 2250, -127, 127);      
      
-         //int8_t strafe = leftHorizontal + rightHorizontal;
-         //constrain(strafe, -127, 127);
+         
          
         
          

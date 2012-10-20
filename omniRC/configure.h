@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-globalVariables:
+
 //Global Variables
 enum Wheel_t{FRONT,REAR,LEFT,RIGHT};
 int wheelSpeed[] = {128, 128, 128, 128};
@@ -84,6 +84,7 @@ static const int TOLERANCE_IN = 10;
 //end Global Constants
 
 //Pin Assignments
+static const uint8_t ICP_PIN = 4;
 static const uint8_t X_IN_PIN = A1;
 static const uint8_t Y_IN_PIN = A2;
 static const uint8_t ROT_IN_PIN = A3;
@@ -94,37 +95,37 @@ static const uint8_t GRIPPER_SERVO_PIN = 25;
 //end Pin Assignments
 
 // Function Prototypes
-int8_t getMD25SpeedByteFormat(uint8_t MD25address)
-void fullStop()
-void setAutoSpeedRegulationOn(uint8_t MD25address)
-void setAutoSpeedRegulationOff(uint8_t MD25address)
-void setTimeoutOn(uint8_t MD25address)
-void setTimeoutOff(uint8_t MD25address)
-uint8_t getWheelCurrent(Wheel_t wheel)
-uint8_t getVolts(uint8_t MD25address)
-void setMD25SpeedByteFormat(uint8_t MD25address, uint8_t mode)
-int16_t getWheelSpeed(Wheel_t wheel)
-void setWheelSpeed(Wheel_t wheel, int16_t speed)// safest, slightly slower response due to mode checking.  does not assume any SpeedByteFormat or valid data, checks everything.
-void drive4wheelSpeeds(int16_t speedArray[])
-void driveWheelSpeed(Wheel_t wheel, int16_t speed)// fast, potentially unsafe.  does not validate data.
-void drive4wheelSpeeds(int16_t FRONTspeed, int16_t REARspeed, int16_t LEFTspeed, int16_t RIGHTspeed)
-uint8_t getVersion(uint8_t device7bitAddress, uint8_t deviceVersionRegister)
-void changeI2Caddress(uint8_t oldAddress, uint8_t newAddress, uint8_t commandRegister, uint8_t commandDelay) //must be run with ONLY the device whose address is to be changed connected to the I2C bus
-uint8_t getAcceleration(uint8_t MD25address)
-void setAcceleration(uint8_t MD25address, uint8_t value)// value from 1-10.  1 = slowest acceleration, 10 = fastest acceleration
-void setAccelerationBoth(uint8_t value)// value from 1-10.  1 = slowest acceleration, 10 = fastest acceleration
-void identifyWheels()
-void octagon()
-void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int Rotate,)
-void moveJoystick(int X, int Y, int Rotate,)
-void moveForward(int speed, long time)
-void moveRearward(int speed, long time)
-void moveLeft(int speed, long time)
-void moveRight(int speed, long time)
-void moveLF(int speed, long time)
-void moveRF(int speed, long time)
-void moveLR(int speed, long time)
-void moveRR(int speed, long time)
+int8_t getMD25SpeedByteFormat(uint8_t MD25address);
+void fullStop();
+void setAutoSpeedRegulationOn(uint8_t MD25address);
+void setAutoSpeedRegulationOff(uint8_t MD25address);
+void setTimeoutOn(uint8_t MD25address);
+void setTimeoutOff(uint8_t MD25address);
+uint8_t getWheelCurrent(Wheel_t wheel);
+uint8_t getVolts(uint8_t MD25address);
+void setMD25SpeedByteFormat(uint8_t MD25address, uint8_t mode);
+int16_t getWheelSpeed(Wheel_t wheel);
+void setWheelSpeed(Wheel_t wheel, int16_t speed);// safest, slightly slower response due to mode checking.  does not assume any SpeedByteFormat or valid data, checks everything.
+void drive4wheelSpeeds(int16_t speedArray[]);
+void driveWheelSpeed(Wheel_t wheel, int16_t speed);// fast, potentially unsafe.  does not validate data.
+void drive4wheelSpeeds(int16_t FRONTspeed, int16_t REARspeed, int16_t LEFTspeed, int16_t RIGHTspeed);
+uint8_t getVersion(uint8_t device7bitAddress, uint8_t deviceVersionRegister);
+void changeI2Caddress(uint8_t oldAddress, uint8_t newAddress, uint8_t commandRegister, uint8_t commandDelay); //must be run with ONLY the device whose address is to be changed connected to the I2C bus
+uint8_t getAcceleration(uint8_t MD25address);
+void setAcceleration(uint8_t MD25address, uint8_t value);// value from 1-10.  1 = slowest acceleration, 10 = fastest acceleration
+void setAccelerationBoth(uint8_t value);// value from 1-10.  1 = slowest acceleration, 10 = fastest acceleration
+void identifyWheels();
+void octagon();
+void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int Rotate);
+void moveJoystick(int X, int Y, int Rotate);
+void moveForward(int speed, long time);
+void moveRearward(int speed, long time);
+void moveLeft(int speed, long time);
+void moveRight(int speed, long time);
+void moveLF(int speed, long time);
+void moveRF(int speed, long time);
+void moveLR(int speed, long time);
+void moveRR(int speed, long time);
 // end Function Prototypes
 
 //Function Definitions
@@ -650,9 +651,9 @@ delay(300);
 moveLF(127, 1000);
 }
 
-void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int Rotate,)
+void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int ROT)
 {
-	int8_t x, y, rotate, 
+	int8_t x, y, rotate;
 	int front, rear, left, right = 0;
 	// normalize input to signed byte range
 	if(X >= (X_IN_HIGH - X_IN_LOW /2) - TOLERANCE_IN || X <= (X_IN_HIGH - X_IN_LOW /2) + TOLERANCE_IN)
@@ -666,7 +667,7 @@ void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int Yhigh
 	if(ROT >= (ROT_IN_HIGH - ROT_IN_LOW /2) - TOLERANCE_IN || ROT <= (ROT_IN_HIGH - ROT_IN_LOW /2) + TOLERANCE_IN)
 	{ rotate = 0;}
 	else
-	{rotate = map(Rotate, RotateLowRange, RotateHighRange,-128, 127);}
+	{rotate = map(ROT, RotateLowRange, RotateHighRange,-128, 127);}
 	// convert input to wheel velocities
 	front = x-rotate;
 	rear = x+rotate;
@@ -693,7 +694,7 @@ void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int Yhigh
   drive4wheelSpeeds(front, rear, left, right);
 }
 
-void moveJoystick(int X, int Y, int Rotate,)
+void moveJoystick(int X, int Y, int Rotate)
 {
   moveJoystick(X_IN_LOW, X_IN_HIGH, X, Y_IN_LOW, Y_IN_HIGH, Y, ROT_IN_LOW, ROT_IN_HIGH, Rotate);
 }
