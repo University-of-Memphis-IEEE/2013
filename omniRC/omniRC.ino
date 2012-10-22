@@ -9,6 +9,16 @@ Servo gripServo;
 int courseTheta = 0;
 int courseMagnitude = 0;
 
+        int X  = 0;
+	int Y  = 0;
+	int ROT = 0;
+	int AUX = 0;
+	bool L_UP_pushed = false;
+	bool L_DWN_pushed = false;
+	bool R_UP_pushed = false;
+	bool R_DWN_pushed = false;
+	int servoTmp = 90;
+
 void setup()
 {
 	Wire.begin();  
@@ -51,15 +61,7 @@ void loop()
 	// speed  -128 (Full Reverse)   0 (Stop)   127 (Full Forward)
 	// speed  -128 (Full ClockWise)   0 (Stop)   127 (Full CounterClockwise)
 
-	int X  = 0;
-	int Y  = 0;
-	int ROT = 0;
-	int AUX = 0;
-	bool L_UP_pushed = false;
-	bool L_DWN_pushed = false;
-	bool R_UP_pushed = false;
-	bool R_DWN_pushed = false;
-	int servoTmp = 90;
+	
 
 	X  = ServoDecode.GetChannelPulseWidth(4); // left horizontal stick
 	Y  = ServoDecode.GetChannelPulseWidth(3); // left vertical stick
@@ -86,6 +88,14 @@ void loop()
 	if(L_UP_pushed || L_DWN_pushed || R_UP_pushed || R_DWN_pushed)
 	{digitalWrite(6, HIGH);}
 	else
-	{digitalWrite(6, LOW);}  
+	{digitalWrite(6, LOW);} 
+
+    for (int i = 0; i <= 6 ; i++)
+    {
+        Serial.print("RC channel ");
+        Serial.print(i);
+        Serial.print(": ");
+	Serial.println(ServoDecode.GetChannelPulseWidth(i));
+    }
 }
 

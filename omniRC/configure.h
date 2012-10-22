@@ -653,6 +653,26 @@ moveLF(127, 1000);
 
 void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int ROT)
 {
+Serial.println("inputs to moveJoystick:");
+
+Serial.print(XlowRange);
+Serial.print(", ");
+Serial.print(XhighRange);
+Serial.print(", ");
+Serial.print(X);
+Serial.print(", ");
+Serial.print(YlowRange);
+Serial.print(", ");
+Serial.print(YhighRange);
+Serial.print(", ");
+Serial.print(Y);
+Serial.print(", ");
+Serial.print(RotateLowRange);
+Serial.print(", ");
+Serial.print(RotateHighRange);
+Serial.print(", ");
+Serial.print(ROT);
+Serial.println("");
 	int8_t x, y, rotate;
 	int front, rear, left, right = 0;
 	// normalize input to signed byte range
@@ -673,6 +693,16 @@ void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int Yhigh
 	rear = x+rotate;
 	left = y-rotate;
 	right = y+rotate;
+Serial.println("wheel speeds:");
+
+Serial.print(front);
+Serial.print(", ");
+Serial.print(rear);
+Serial.print(", ");
+Serial.print(left);
+Serial.print(", ");
+Serial.print(right);
+Serial.println("");
 	// find wheel with greatest speed 
 	int * highestSpeedPtr = &front;
 	if(abs(rear) > abs(*highestSpeedPtr))
@@ -691,6 +721,17 @@ void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int Yhigh
 	left *= scaleFactor;
 	right *= scaleFactor;	
 	}
+
+Serial.println("scaled wheel speeds:");
+
+Serial.print(front);
+Serial.print(", ");
+Serial.print(rear);
+Serial.print(", ");
+Serial.print(left);
+Serial.print(", ");
+Serial.print(right);
+Serial.println("");
   drive4wheelSpeeds(front, rear, left, right);
 }
 
