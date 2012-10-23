@@ -3,6 +3,7 @@
 #include "configure.h"
 #include "ServoDecode.h"
 
+
 long loopCount = 0;
 Servo armServo;
 Servo gripServo;
@@ -17,7 +18,8 @@ int courseMagnitude = 0;
 	bool L_DWN_pushed = false;
 	bool R_UP_pushed = false;
 	bool R_DWN_pushed = false;
-	int servoTmp = 90;
+	
+        bool configureRCenabled = false;
 
 void setup()
 {
@@ -30,6 +32,7 @@ void setup()
         ServoDecode.setFailsafe(4,1500); // set channel 4 failsafe pulsewidth. left horizontal stick
         ServoDecode.setFailsafe(5,1500); // set channel 5 failsafe pulsewidth. left buttons
         ServoDecode.setFailsafe(6,1500); // set channel 6 failsafe pulsewidth. right buttons
+        configureRC(configureRCenabled);
 	pinMode(6, OUTPUT);
 	digitalWrite(6, HIGH);
 	Serial.println("setup() entered.");
@@ -65,30 +68,12 @@ void loop()
 
 	X  = ServoDecode.GetChannelPulseWidth(4); // left horizontal stick
 	Y  = ServoDecode.GetChannelPulseWidth(3); // left vertical stick
-	ROT = ServoDecode.GetChannelPulseWidth(1); // right horizontal stick  
-	moveJoystick(750, 2250, X, 750, 2250, Y, 750, 2250, ROT);
-
-	AUX = map(ServoDecode.GetChannelPulseWidth(2), 750, 2250, -127, 127);
+	ROT = ServoDecode.GetChannelPulseWidth(1); // right horizontal stick 
+	AUX = map(ServoDecode.GetChannelPulseWidth(2), 1000, 2000, -127, 127);
 	// do something here with the extra AUX analog channel, right verticle stick.
+        moveJoystick(X, Y, ROT);
+	parseRCbuttons(L_UP_pushed, L_DWN_pushed, R_UP_pushed, R_DWN_pushed, armServo, gripServo);
 
-	if(L_UP_pushed = (ServoDecode.GetChannelPulseWidth(5) < 1500-200) &&
-	 (servoTmp = gripServo.read()) < 180)// open grip commanded and grip not already fully open
-	{gripServo.write(servoTmp+1);}
-	if(L_DWN_pushed = (ServoDecode.GetChannelPulseWidth(5) > 1500+200) &&
-	 (servoTmp = gripServo.read()) > 0)// close grip commanded and grip not already fully closed
-	{gripServo.write(servoTmp-1);}
-	if(R_UP_pushed = (ServoDecode.GetChannelPulseWidth(6) < 1500-200) &&
-	 (servoTmp = armServo.read()) < 180)// raise arm commanded and arm not already fully raised
-	{armServo.write(servoTmp+1);}
-	if(R_DWN_pushed = (ServoDecode.GetChannelPulseWidth(6) > 1500+200) &&
-	 (servoTmp = armServo.read()) > 0)// lower arm commanded and arm not already fully lowered
-	{armServo.write(servoTmp-1);}  
-	
-	//illuminate LED on any button push
-	if(L_UP_pushed || L_DWN_pushed || R_UP_pushed || R_DWN_pushed)
-	{digitalWrite(6, HIGH);}
-	else
-	{digitalWrite(6, LOW);} 
 
     for (int i = 0; i <= 6 ; i++)
     {

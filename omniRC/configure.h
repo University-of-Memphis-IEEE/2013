@@ -72,13 +72,61 @@ static const uint8_t SECONDARY_MD25_ADDR = 0xB4 >> 1;                     // Add
  // assumes that center/stop position lies at I( (X_IN_HIGH - X_IN_LOW /2), (Y_IN_HIGH - Y_IN_LOW /2), (ROT_IN_HIGH - ROT_IN_LOW /2) )
 // note: it is OK if HIGH value is actually a lower number than LOW value.  These lables were chosen to agree with the map() parameter lables.
 // adjust these values to suit the actual hardware used
-static const int X_IN_LOW = 0; // Extreme Left value
-static const int X_IN_HIGH = 1024;// Extreme Right value
-static const int Y_IN_LOW = 0; // Extreme Rearward value
-static const int Y_IN_HIGH = 1024;// Extreme Foreward value
-static const int ROT_IN_LOW = 0; // Extreme ClockWise value
-static const int ROT_IN_HIGH = 1024;// Extreme CounterClockWise value
-static const int TOLERANCE_IN = 10;
+static const int X_IN_LOW = 1000; // Extreme Left value
+static const int X_IN_HIGH = 2000;// Extreme Right value
+static const int Y_IN_LOW = 1000; // Extreme Rearward value
+static const int Y_IN_HIGH = 2000;// Extreme Foreward value
+static const int ROT_IN_LOW = 1000; // Extreme ClockWise value
+static const int ROT_IN_HIGH = 2000;// Extreme CounterClockWise value
+static const int TOLERANCE_IN = 25;
+/*neutral sticks
+RC channel 0: 9399
+
+RC channel 1: 1516
+
+RC channel 2: 1516
+
+RC channel 3: 1493
+
+RC channel 4: 1522
+
+RC channel 5: 1508
+
+RC channel 6: 1514
+end neutral sticks*/
+
+/*left up sticks
+RC channel 0: 12204
+
+RC channel 1: 1086
+
+RC channel 2: 1089
+
+RC channel 3: 1093
+
+RC channel 4: 1080
+
+RC channel 5: 961
+
+RC channel 6: 961
+end left up sticks*/
+
+/*right down sticks
+RC channel 0: 
+
+RC channel 1: 1946
+
+RC channel 2: 1944
+
+RC channel 3: 1926
+
+RC channel 4: 1932
+
+RC channel 5: 2067
+
+RC channel 6: 2069
+end right down sticks*/
+
 // atypical alternate 3*2 axis input(unused)
 // each axis has a positive unsigned int value and bool direction.  center/stop lies at (0,0,0)
 //end Global Constants
@@ -116,7 +164,7 @@ void setAcceleration(uint8_t MD25address, uint8_t value);// value from 1-10.  1 
 void setAccelerationBoth(uint8_t value);// value from 1-10.  1 = slowest acceleration, 10 = fastest acceleration
 void identifyWheels();
 void octagon();
-void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int Rotate);
+void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int Rotate, int Deadband);
 void moveJoystick(int X, int Y, int Rotate);
 void moveForward(int speed, long time);
 void moveRearward(int speed, long time);
@@ -651,7 +699,7 @@ delay(300);
 moveLF(127, 1000);
 }
 
-void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int ROT)
+void moveJoystick(int XlowRange, int XhighRange, int X, int YlowRange, int YhighRange, int Y, int RotateLowRange, int RotateHighRange, int ROT, int Deadband)
 {
 Serial.println("inputs to moveJoystick:");
 
@@ -673,18 +721,20 @@ Serial.print(RotateHighRange);
 Serial.print(", ");
 Serial.print(ROT);
 Serial.println("");
+
 	int8_t x, y, rotate;
 	int front, rear, left, right = 0;
+
 	// normalize input to signed byte range
-	if(X >= (X_IN_HIGH - X_IN_LOW /2) - TOLERANCE_IN || X <= (X_IN_HIGH - X_IN_LOW /2) + TOLERANCE_IN)
+	if(X >= (XhighRange - XlowRange /2) - Deadband && X <= (XhighRange - XlowRange /2) + Deadband)
 	{ x = 0;}
 	else
 	{x = map(X, XlowRange, XhighRange,-128, 127);}
-	if(Y >= (Y_IN_HIGH - Y_IN_LOW /2) - TOLERANCE_IN || Y <= (Y_IN_HIGH - Y_IN_LOW /2) + TOLERANCE_IN)
+	if(Y >= (YhighRange - YlowRange /2) - Deadband && Y <= (YhighRange - YlowRange /2) + Deadband)
 	{ y = 0;}
 	else
 	{y = map(Y, YlowRange, YhighRange,-128, 127);}
-	if(ROT >= (ROT_IN_HIGH - ROT_IN_LOW /2) - TOLERANCE_IN || ROT <= (ROT_IN_HIGH - ROT_IN_LOW /2) + TOLERANCE_IN)
+	if(ROT >= (RotateHighRange - RotateLowRange /2) - Deadband && ROT <= (RotateHighRange - RotateLowRange /2) + Deadband)
 	{ rotate = 0;}
 	else
 	{rotate = map(ROT, RotateLowRange, RotateHighRange,-128, 127);}
@@ -712,7 +762,7 @@ Serial.println("");
 	if(abs(right) > abs(*highestSpeedPtr))
 	{highestSpeedPtr = &right;}
 	
-	if(*highestSpeedPtr > 127)// at least one wheel would need to go faster than it is capable
+	if(abs(*highestSpeedPtr) > 127)// at least one wheel would need to go faster than it is capable
 	{// scale all wheel speeds proportionately
 	// (*highestSpeed) * scaleFactor = +/-127
 	float scaleFactor = 127.0/abs(*highestSpeedPtr);
@@ -732,13 +782,17 @@ Serial.print(left);
 Serial.print(", ");
 Serial.print(right);
 Serial.println("");
+
+
   drive4wheelSpeeds(front, rear, left, right);
 }
 
-void moveJoystick(int X, int Y, int Rotate)
+void moveJoystick(int X, int Y, int ROT)
 {
-  moveJoystick(X_IN_LOW, X_IN_HIGH, X, Y_IN_LOW, Y_IN_HIGH, Y, ROT_IN_LOW, ROT_IN_HIGH, Rotate);
+    moveJoystick(X_IN_LOW, X_IN_HIGH, X, Y_IN_LOW, Y_IN_HIGH, Y, ROT_IN_LOW, ROT_IN_HIGH, ROT, TOLERANCE_IN);
 }
+
+
 
 void moveForward(int speed, long time)
 {
@@ -795,4 +849,5 @@ void moveRR(int speed, long time)
   delay(time);
   fullStop();
 }
+
 //end Function Definitions

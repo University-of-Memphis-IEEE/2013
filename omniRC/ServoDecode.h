@@ -171,11 +171,12 @@ class ServoDecodeClass //ServoDecodeClass begin
 // make one instance for the user
 extern ServoDecodeClass ServoDecode = ServoDecodeClass();
 
-void configureRC()//used for debugging, testing, and capturing typical values for setting up constants
+void configureRC(bool& configureRCenabled)//used for debugging, testing, and capturing typical values for setting up constants
 {
     int pulsewidth;
-    while(true)
+    while(configureRCenabled)
     {   
+      
         // print the decoder state
       if( ServoDecode.getState()!= READY_state) 
       {
@@ -191,22 +192,37 @@ void configureRC()//used for debugging, testing, and capturing typical values fo
         }
         Serial.println("");
       }
-      else {
+      else 
+      {        
         // decoder is ready, print the channel pulse widths
-        for ( int i =1; i <=MAX_CHANNELS; i++ ){ // print the status of the first four channels
-    	Serial.print("Channel ");
-    	Serial.print(i);
-    	Serial.print(" pulsewidth : ");
-    	pulsewidth = ServoDecode.GetChannelPulseWidth(i);
-    	Serial.print(pulsewidth);
-    	Serial.print("  ");
-        }
-        Serial.println("");        
+        
       }
     }
 }    
  
- 
+void parseRCbuttons(bool& L_UP_pushed, bool& L_DWN_pushed, bool& R_UP_pushed, bool& R_DWN_pushed, Servo& L_servo, Servo& R_servo)
+{
+        int servoTmp = 90;
+        if(L_UP_pushed = (ServoDecode.GetChannelPulseWidth(5) < 1500-200) &&
+	 (servoTmp = L_servo.read()) < 180)// open grip commanded and grip not already fully open
+	{L_servo.write(servoTmp+1);}
+	if(L_DWN_pushed = (ServoDecode.GetChannelPulseWidth(5) > 1500+200) &&
+	 (servoTmp = L_servo.read()) > 0)// close grip commanded and grip not already fully closed
+	{L_servo.write(servoTmp-1);}
+
+	if(R_UP_pushed = (ServoDecode.GetChannelPulseWidth(6) < 1500-200) &&
+	 (servoTmp = R_servo.read()) < 180)// raise arm commanded and arm not already fully raised
+	{R_servo.write(servoTmp+1);}
+	if(R_DWN_pushed = (ServoDecode.GetChannelPulseWidth(6) > 1500+200) &&
+	 (servoTmp = R_servo.read()) > 0)// lower arm commanded and arm not already fully lowered
+	{R_servo.write(servoTmp-1);}  
+	
+	//illuminate LED on any button push
+	if(L_UP_pushed || L_DWN_pushed || R_UP_pushed || R_DWN_pushed)
+	{digitalWrite(6, HIGH);}
+	else
+	{digitalWrite(6, LOW);} 
+}
 
 
 
@@ -251,10 +267,10 @@ void radioControlLoop()
         Serial.println("rightButtonMax: ");
         Serial.println(rightButtonMax);
         
-    	leftVertical = map(leftVertical, 750, 2250, -127, 127);       
-       rightVertical = map(rightVertical, 750, 2250, -127, 127); 
-        leftHorizontal = map(leftHorizontal, 750, 2250, -127, 127);       
-       rightHorizontal = map(rightHorizontal, 750, 2250, -127, 127);      
+    	leftVertical = map(leftVertical, 1000, 2000, -127, 127);       
+       rightVertical = map(rightVertical, 1000, 2000, -127, 127); 
+        leftHorizontal = map(leftHorizontal, 1000, 2000, -127, 127);       
+       rightHorizontal = map(rightHorizontal, 1000, 2000, -127, 127);      
      
          
          
