@@ -74,8 +74,8 @@ static const uint8_t SECONDARY_MD25_ADDR = 0xB4 >> 1;                     // Add
 // adjust these values to suit the actual hardware used
 static const int X_IN_LOW = 1000; // Extreme Left value
 static const int X_IN_HIGH = 2000;// Extreme Right value
-static const int Y_IN_LOW = 1000; // Extreme Rearward value
-static const int Y_IN_HIGH = 2000;// Extreme Foreward value
+static const int Y_IN_LOW = 2000; // Extreme Rearward value
+static const int Y_IN_HIGH = 1000;// Extreme Foreward value
 static const int ROT_IN_LOW = 1000; // Extreme ClockWise value
 static const int ROT_IN_HIGH = 2000;// Extreme CounterClockWise value
 static const int TOLERANCE_IN = 25;
