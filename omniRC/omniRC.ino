@@ -9,7 +9,7 @@ Servo armServo;
 Servo gripServo;
 int courseTheta = 0;
 int courseMagnitude = 0;
-
+        bool RCenabled = false;
         int X  = 0;
 	int Y  = 0;
 	int ROT = 0;
@@ -25,18 +25,16 @@ void setup()
 {
 	Wire.begin();  
 	Serial.begin(9600);
-        ServoDecode.begin();
-        ServoDecode.setFailsafe(1,1500); // set channel 1 failsafe pulsewidth. right horizontal stick
-        ServoDecode.setFailsafe(2,1500); // set channel 2 failsafe pulsewidth. right vertical stick
-        ServoDecode.setFailsafe(3,1500); // set channel 3 failsafe pulsewidth. left vertical stick
-        ServoDecode.setFailsafe(4,1500); // set channel 4 failsafe pulsewidth. left horizontal stick
-        ServoDecode.setFailsafe(5,1500); // set channel 5 failsafe pulsewidth. left buttons
-        ServoDecode.setFailsafe(6,1500); // set channel 6 failsafe pulsewidth. right buttons
-        configureRC(configureRCenabled);
-	pinMode(6, OUTPUT);
-	digitalWrite(6, HIGH);
-	Serial.println("setup() entered.");
-  
+ServoDecode.begin();
+        pinMode(LED_PIN, OUTPUT);
+	digitalWrite(LED_PIN, HIGH);
+        delay(2000);        
+if( ServoDecode.getState() == READY_state)// check if RC is hooked up and turned on.
+{
+  RCenabled = true;
+  configureRC(configureRCenabled);
+  digitalWrite(LED_PIN, LOW);
+}	  
 	setAutoSpeedRegulationOn(PRIMARY_MD25_ADDR);
 	setAutoSpeedRegulationOn(SECONDARY_MD25_ADDR);
 	setTimeoutOff(PRIMARY_MD25_ADDR);
@@ -47,40 +45,30 @@ void setup()
 	armServo.attach(ARM_SERVO_PIN);
 	gripServo.attach(GRIPPER_SERVO_PIN);
 	armServo.write(90); // center servos
-	gripServo.write(90);
-	
-	Serial.println("End of Setup()");
-	Serial.print("Loop:");
-	Serial.println(loopCount);
-	digitalWrite(6, LOW);
+	gripServo.write(90);	
 }
 
 void loop()
 {  
-	loopCount++;  
-	Serial.print("Loop:");
-	Serial.println(loopCount);
+  if(RCenabled)
+  {
+    // Run in radio controlled mode
+    X  = ServoDecode.GetChannelPulseWidth(4); // left horizontal stick
+    Y  = ServoDecode.GetChannelPulseWidth(3); // left vertical stick
+    ROT = ServoDecode.GetChannelPulseWidth(1); // right horizontal stick 
+    AUX = map(ServoDecode.GetChannelPulseWidth(2), 1000, 2000, -127, 127);
+    // do something here with the extra AUX analog channel, right verticle stick.
+    moveJoystick(X, Y, ROT);
+    parseRCbuttons(L_UP_pushed, L_DWN_pushed, R_UP_pushed, R_DWN_pushed, armServo, gripServo);
+  }
+  else
+  {
+    // Run in competition mode
+  
+  }
 	// speed  -128 (Full Left)   0 (Stop)   127 (Full Right)
 	// speed  -128 (Full Reverse)   0 (Stop)   127 (Full Forward)
 	// speed  -128 (Full ClockWise)   0 (Stop)   127 (Full CounterClockwise)
 
-	
-
-	X  = ServoDecode.GetChannelPulseWidth(4); // left horizontal stick
-	Y  = ServoDecode.GetChannelPulseWidth(3); // left vertical stick
-	ROT = ServoDecode.GetChannelPulseWidth(1); // right horizontal stick 
-	AUX = map(ServoDecode.GetChannelPulseWidth(2), 1000, 2000, -127, 127);
-	// do something here with the extra AUX analog channel, right verticle stick.
-        moveJoystick(X, Y, ROT);
-	parseRCbuttons(L_UP_pushed, L_DWN_pushed, R_UP_pushed, R_DWN_pushed, armServo, gripServo);
-
-
-    for (int i = 0; i <= 6 ; i++)
-    {
-        Serial.print("RC channel ");
-        Serial.print(i);
-        Serial.print(": ");
-	Serial.println(ServoDecode.GetChannelPulseWidth(i));
-    }
 }
 

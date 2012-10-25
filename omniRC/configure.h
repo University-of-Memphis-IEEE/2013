@@ -132,6 +132,7 @@ end right down sticks*/
 //end Global Constants
 
 //Pin Assignments
+static const uint8_t LED_PIN = 6;
 static const uint8_t ICP_PIN = 4;
 static const uint8_t X_IN_PIN = A1;
 static const uint8_t Y_IN_PIN = A2;
