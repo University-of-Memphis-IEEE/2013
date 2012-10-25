@@ -76,54 +76,33 @@ static const int X_IN_LOW = 1000; // Extreme Left value
 static const int X_IN_HIGH = 2000;// Extreme Right value
 static const int Y_IN_LOW = 2000; // Extreme Rearward value
 static const int Y_IN_HIGH = 1000;// Extreme Foreward value
-static const int ROT_IN_LOW = 1000; // Extreme ClockWise value
-static const int ROT_IN_HIGH = 2000;// Extreme CounterClockWise value
+static const int ROT_IN_LOW = 2000; // Extreme ClockWise value
+static const int ROT_IN_HIGH = 1000;// Extreme CounterClockWise value
 static const int TOLERANCE_IN = 25;
 /*neutral sticks
-RC channel 0: 9399
-
 RC channel 1: 1516
-
 RC channel 2: 1516
-
 RC channel 3: 1493
-
 RC channel 4: 1522
-
 RC channel 5: 1508
-
 RC channel 6: 1514
 end neutral sticks*/
 
 /*left up sticks
-RC channel 0: 12204
-
 RC channel 1: 1086
-
 RC channel 2: 1089
-
 RC channel 3: 1093
-
 RC channel 4: 1080
-
 RC channel 5: 961
-
 RC channel 6: 961
 end left up sticks*/
 
 /*right down sticks
-RC channel 0: 
-
 RC channel 1: 1946
-
 RC channel 2: 1944
-
 RC channel 3: 1926
-
 RC channel 4: 1932
-
 RC channel 5: 2067
-
 RC channel 6: 2069
 end right down sticks*/
 
