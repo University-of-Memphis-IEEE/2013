@@ -1,0 +1,12 @@
+﻿Build started 11/9/2012 2:23:30 PM.
+     1>Project "C:\Users\slo\Documents\Arduino\OmniTest2\OmniTest2.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\OmniTest2.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       FinalizeBuildStatus:
+         Deleting file "Debug\OmniTest2.unsuccessfulbuild".
+         Touching "Debug\OmniTest2.lastbuildstate".
+     1>Done Building Project "C:\Users\slo\Documents\Arduino\OmniTest2\OmniTest2.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.06
