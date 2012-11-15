@@ -71,13 +71,20 @@ void loop()
 	
 	//illuminate LED on valid button push
       if(R_UP_pushed || R_DWN_pushed)
-	{digitalWrite(6, HIGH);}
+	{digitalWrite(6, HIGH);}                                                                                                                                                                                                                               
 	else
 	{digitalWrite(6, LOW);} 
   }
   else
   {
     // Run in competition mode
+    drive(64, 64);
+    delay(2000);
+    drive(-64, -64);
+    delay(2000);
+    drive(50, -50);
+    delay(500);
+    drive(0, 0);
   
   }
 }
